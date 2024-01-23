@@ -23,7 +23,10 @@ WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(),
             string name, customerType;
             int distance, maxOrders;
             iss >> name >> customerType >> distance >> maxOrders;
-            customers.push_back(Customer(name, customerType, distance, maxOrders));
+            if (customerType == "soldier")
+                customers.push_back(SoldierCustomer(customerCounter, name, distance, maxOrders));
+            else if (customerType == "civilian")
+                customers.push_back(CivilianCustomer(customerCounter, name, distance, maxOrders));
             customerCounter++;
         }
         else if (type == "volunteer")

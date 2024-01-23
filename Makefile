@@ -1,23 +1,24 @@
-all: bin/WareHouse
+COMPILER_CMD = g++ -g -Wall -Weffc++ -std=c++11 -Iinclude
 
-bin/WareHouse: bin/WareHouse.o bin/BaseAction.o bin/customer.o bin/order.o bin/volunteer.o
-	g++ bin/WareHouse.o bin/BaseAction.o bin/customer.o bin/order.o bin/volunteer.o -o bin/WareHouse
+SRC_DIR=src
+BIN_DIR=bin
 
-bin/BaseAction.o: src/BaseAction.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/BaseAction.o src/BaseAction.cpp
+# Get all .cpp files in the source directory
+SOURCES=$(wildcard $(SRC_DIR)/*.cpp)
 
-bin/WareHouse.o: src/main.cpp  # Adjusted the path to main.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude src/main.cpp -o bin/WareHouse.o
+# Generate corresponding .o files in the bin directory
+OBJECTS=$(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.o,$(SOURCES))
 
-bin/customer.o: src/customer.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/customer.o src/customer.cpp
+# Name of the final executable
+EXECUTABLE=$(BIN_DIR)/warehouse
 
-bin/order.o: src/order.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/order.o src/order.cpp
+all: clean $(EXECUTABLE)
 
-bin/volunteer.o: src/volunteer.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/volunteer.o src/volunteer.cpp
+$(EXECUTABLE): $(OBJECTS)
+	$(COMPILER_CMD) $^ -o $@		
 
-.PHONY: clean
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(COMPILER_CMD) -c $< -o $@
+
 clean:
-	rm -f bin/*
+	find $(BIN_DIR) -maxdepth 1 -type f -exec rm -f {} \;
