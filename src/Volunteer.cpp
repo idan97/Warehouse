@@ -1,7 +1,7 @@
 #include "../include/Volunteer.h"
 
 Volunteer::Volunteer(int id, const string &name) : id(id), name(name), completedOrderId(NO_ORDER), activeOrderId(NO_ORDER) {}
- 
+
 // Assignment Operator
 Volunteer &Volunteer::operator=(const Volunteer &other)
 {
@@ -59,7 +59,7 @@ bool Volunteer::isBusy() const
     return activeOrderId != NO_ORDER;
 }
 
-CollectorVolunteer::CollectorVolunteer(int id, string name, int coolDown) 
+CollectorVolunteer::CollectorVolunteer(int id, string name, int coolDown)
     : Volunteer(id, name), coolDown(coolDown), timeLeft(0) {}
 
 // Destructor
