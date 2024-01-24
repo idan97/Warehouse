@@ -1,124 +1,224 @@
 #include "../include/BaseAction.h"
+#include <iostream>
 
-Order::Order(int id) : BaseAction(), customerId(id) {}
+BaseAction::BaseAction() : status(ActionStatus::ERROR) {}
 
-void Order::act(WareHouse &wareHouse) {
-    // Implementation of Order action
+ActionStatus BaseAction::getStatus() const
+{
+    return status;
 }
 
-Order* Order::clone() const {
+void BaseAction::complete()
+{
+    status = ActionStatus::COMPLETED;
+}
+
+void BaseAction::error(string errorMsg)
+{
+    status = ActionStatus::ERROR;
+    this->errorMsg = errorMsg;
+    std::cout << "Error: " << errorMsg << std::endl;
+}
+
+string BaseAction::getErrorMsg() const
+{
+    return errorMsg;
+}
+
+SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
+
+void SimulateStep::act(WareHouse &wareHouse)
+{
+    for (int i = 0; i < numOfSteps; ++i)
+    {
+        wareHouse.simulateStep();
+    }
+    complete();
+}
+
+std::string SimulateStep::toString() const
+{
+    return "simulateStep " + std::to_string(numOfSteps);
+}
+
+SimulateStep *SimulateStep::clone() const
+{
+    return new SimulateStep(*this);
+}
+
+Order::Order(int id) : customerId(id) {}
+
+void Order::act(WareHouse &wareHouse)
+{
+    wareHouse.createOrder(customerId);
+    complete();
+}
+
+Order *Order::clone() const
+{
     return new Order(*this);
 }
 
-string Order::toString() const {
-    // Implementation of toString for Order action
+string Order::toString() const
+{
+    return "order " + std::to_string(customerId);
 }
 
 AddCustomer::AddCustomer(string customerName, string customerType, int distance, int maxOrders)
-    : BaseAction(), customerName(customerName), customerType(customerType), distance(distance), maxOrders(maxOrders) {}
-
-void AddCustomer::act(WareHouse &wareHouse) {
-    // Implementation of AddCustomer action
+    : customerName(customerName), distance(distance), maxOrders(maxOrders)
+{
+    if (customerType == "soldier")
+    {
+        this->customerType = CustomerType::Soldier;
+    }
+    else
+    {
+        this->customerType = CustomerType::Civilian;
+    }
 }
 
-AddCustomer* AddCustomer::clone() const {
+void AddCustomer::act(WareHouse &wareHouse)
+{
+    wareHouse.addCustomer(customerName, customerType, distance, maxOrders);
+    complete();
+}
+
+AddCustomer *AddCustomer::clone() const
+{
     return new AddCustomer(*this);
 }
 
-string AddCustomer::toString() const {
-    // Implementation of toString for AddCustomer action
+string AddCustomer::toString() const
+{
+    string customerTypeStr;
+    if (customerType == CustomerType::Soldier)
+    {
+        customerTypeStr = "soldier";
+    }
+    else
+    {
+        customerTypeStr = "civilian";
+    }
+    return "customer " + customerName + " " + customerTypeStr + " " + std::to_string(distance) + " " + std::to_string(maxOrders);
 }
 
-PrintOrderStatus::PrintOrderStatus(int id) : BaseAction(), orderId(id) {}
+PrintOrderStatus::PrintOrderStatus(int id) : orderId(id) {}
 
-void PrintOrderStatus::act(WareHouse &wareHouse) {
-    // Implementation of PrintOrderStatus action
+void PrintOrderStatus::act(WareHouse &wareHouse)
+{
+    wareHouse.printOrderStatus(orderId);
+    complete();
 }
 
-PrintOrderStatus* PrintOrderStatus::clone() const {
+PrintOrderStatus *PrintOrderStatus::clone() const
+{
     return new PrintOrderStatus(*this);
 }
 
-string PrintOrderStatus::toString() const {
-    // Implementation of toString for PrintOrderStatus action
+string PrintOrderStatus::toString() const
+{
+    return "orderStatus " + std::to_string(orderId);
 }
 
-PrintCustomerStatus::PrintCustomerStatus(int customerId) : BaseAction(), customerId(customerId) {}
+PrintCustomerStatus::PrintCustomerStatus(int customerId) : customerId(customerId) {}
 
-void PrintCustomerStatus::act(WareHouse &wareHouse) {
-    // Implementation of PrintCustomerStatus action
+void PrintCustomerStatus::act(WareHouse &wareHouse)
+{
+    wareHouse.printCustomerStatus(customerId);
+    complete();
 }
 
-PrintCustomerStatus* PrintCustomerStatus::clone() const {
+PrintCustomerStatus *PrintCustomerStatus::clone() const
+{
     return new PrintCustomerStatus(*this);
 }
 
-string PrintCustomerStatus::toString() const {
-    // Implementation of toString for PrintCustomerStatus action
+string PrintCustomerStatus::toString() const
+{
+    return "customerStatus " + std::to_string(customerId);
 }
 
-PrintVolunteerStatus::PrintVolunteerStatus(int id) : BaseAction(), VolunteerId(id) {}
+PrintVolunteerStatus::PrintVolunteerStatus(int id) : VolunteerId(id) {}
 
-void PrintVolunteerStatus::act(WareHouse &wareHouse) {
-    // Implementation of PrintVolunteerStatus action
+void PrintVolunteerStatus::act(WareHouse &wareHouse)
+{
+    wareHouse.printVolunteerStatus(VolunteerId);
+    complete();
 }
 
-PrintVolunteerStatus* PrintVolunteerStatus::clone() const {
+PrintVolunteerStatus *PrintVolunteerStatus::clone() const
+{
     return new PrintVolunteerStatus(*this);
 }
 
-string PrintVolunteerStatus::toString() const {
-    // Implementation of toString for PrintVolunteerStatus action
+string PrintVolunteerStatus::toString() const
+{
+    return "volunteerStatus " + std::to_string(VolunteerId);
 }
 
-PrintActionsLog::PrintActionsLog() : BaseAction() {}
+PrintActionsLog::PrintActionsLog() {}
 
-void PrintActionsLog::act(WareHouse &wareHouse) {
-    // Implementation of PrintActionsLog action
+void PrintActionsLog::act(WareHouse &wareHouse)
+{
+    wareHouse.printActionsLog();
+    complete();
 }
 
-PrintActionsLog* PrintActionsLog::clone() const {
+PrintActionsLog *PrintActionsLog::clone() const
+{
     return new PrintActionsLog(*this);
 }
 
-string PrintActionsLog::toString() const {
-    // Implementation of toString for PrintActionsLog action
+string PrintActionsLog::toString() const
+{
+    return "log";
 }
 
-Close::Close() : BaseAction() {}
+Close::Close() {}
 
-void Close::act(WareHouse &wareHouse) {
-    // Implementation of Close action
+void Close::act(WareHouse &wareHouse)
+{
+    wareHouse.close();
+    complete();
 }
 
-string Close::toString() const {
-    // Implementation of toString for Close action
+string Close::toString() const
+{
+    return "close";
 }
 
-BackupWareHouse::BackupWareHouse() : BaseAction() {}
+BackupWareHouse::BackupWareHouse() {}
 
-void BackupWareHouse::act(WareHouse &wareHouse) {
-    // Implementation of BackupWareHouse action
+void BackupWareHouse::act(WareHouse &wareHouse)
+{
+    wareHouse.backupWarehouse();
+    complete();
 }
 
-BackupWareHouse* BackupWareHouse::clone() const {
+BackupWareHouse *BackupWareHouse::clone() const
+{
     return new BackupWareHouse(*this);
 }
 
-string BackupWareHouse::toString() const {
-    // Implementation of toString for BackupWareHouse action
+string BackupWareHouse::toString() const
+{
+    return "backup";
 }
 
-RestoreWareHouse::RestoreWareHouse() : BaseAction() {}
+RestoreWareHouse::RestoreWareHouse() {}
 
-void RestoreWareHouse::act(WareHouse &wareHouse) {
-    // Implementation of RestoreWareHouse action
+void RestoreWareHouse::act(WareHouse &wareHouse)
+{
+    wareHouse.restoreWarehouse();
+    complete();
 }
 
-RestoreWareHouse* RestoreWareHouse::clone() const {
+RestoreWareHouse *RestoreWareHouse::clone() const
+{
     return new RestoreWareHouse(*this);
 }
 
-string RestoreWareHouse::toString() const {
-    // Implementation of toString for RestoreWareHouse action
+string RestoreWareHouse::toString() const
+{
+    return "restore";
 }

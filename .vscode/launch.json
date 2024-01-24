@@ -6,7 +6,7 @@
         "name": "Debug",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${workspaceFolder}/Skeleton/Skeleton/src/main",  // Adjust the path based on your executable name and location
+        "program": "${workspaceFolder}/src/main.cpp",  // Adjust the path based on your executable name and location
         "args": [],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",

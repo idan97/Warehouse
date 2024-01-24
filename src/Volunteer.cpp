@@ -2,38 +2,6 @@
 
 Volunteer::Volunteer(int id, const string &name) : id(id), name(name), completedOrderId(NO_ORDER), activeOrderId(NO_ORDER) {}
 
-// Assignment Operator
-Volunteer &Volunteer::operator=(const Volunteer &other)
-{
-    if (this != &other)
-    {
-        id = other.id;
-        name = other.name;
-        completedOrderId = other.completedOrderId;
-        activeOrderId = other.activeOrderId;
-    }
-    return *this;
-}
-
-// Destructor
-Volunteer::~Volunteer() {}
-
-// Move Constructor
-Volunteer::Volunteer(Volunteer &&other) noexcept : id(std::move(other.id)), name(std::move(other.name)), completedOrderId(std::move(other.completedOrderId)), activeOrderId(std::move(other.activeOrderId)) {}
-
-// Move Assignment Operator
-Volunteer &Volunteer::operator=(Volunteer &&other) noexcept
-{
-    if (this != &other)
-    {
-        id = std::move(other.id);
-        name = std::move(other.name);
-        completedOrderId = std::move(other.completedOrderId);
-        activeOrderId = std::move(other.activeOrderId);
-    }
-    return *this;
-}
-
 int Volunteer::getId() const
 {
     return id;
@@ -61,39 +29,6 @@ bool Volunteer::isBusy() const
 
 CollectorVolunteer::CollectorVolunteer(int id, string name, int coolDown)
     : Volunteer(id, name), coolDown(coolDown), timeLeft(0) {}
-
-// Destructor
-CollectorVolunteer::~CollectorVolunteer() {}
-
-// copy constructor
-CollectorVolunteer ::CollectorVolunteer(const CollectorVolunteer &other) : Volunteer(other), coolDown(other.coolDown), timeLeft(other.timeLeft) {}
-
-// assignment operator
-CollectorVolunteer &CollectorVolunteer::operator=(const CollectorVolunteer &other)
-{
-    if (this != &other)
-    {
-        Volunteer::operator=(other);
-        coolDown = other.coolDown;
-        timeLeft = other.timeLeft;
-    }
-    return *this;
-}
-
-// move constructor
-CollectorVolunteer::CollectorVolunteer(CollectorVolunteer &&other) noexcept : Volunteer(std::move(other)), coolDown(std::move(other.coolDown)), timeLeft(std::move(other.timeLeft)) {}
-
-// move assignment operator
-CollectorVolunteer &CollectorVolunteer::operator=(CollectorVolunteer &&other) noexcept
-{
-    if (this != &other)
-    {
-        Volunteer::operator=(std::move(other));
-        coolDown = std::move(other.coolDown);
-        timeLeft = std::move(other.timeLeft);
-    }
-    return *this;
-}
 
 CollectorVolunteer *CollectorVolunteer::clone() const
 {

@@ -23,6 +23,10 @@ void Order::setDriverId(int driverId) {
     this->driverId = driverId; 
 }
 
+int Order::getDistance() const {
+    return distance;
+}
+
 int Order::getCollectorId() const {
     return collectorId;
 }

@@ -6,6 +6,7 @@
 #include "../include/Order.h"
 #include "../include/Customer.h"
 #include "../include/BaseAction.h"
+#include <iostream>
 
 WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(), volunteers(), pendingOrders(), vol(), completedOrders(), customers(), customerCounter(0), volunteerCounter(0)
 {
@@ -59,31 +60,44 @@ WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(),
     }
 }
 
-void WareHouse::start() {
-    // Implementation of the start function
+void WareHouse::start()
+{
+    if (isOpen){
+        cout << "Warehouse is open" << endl;
+    }else{
+        cout << "Warehouse is closed" << endl;
+    }
 }
 
-const vector<BaseAction*> &WareHouse::getActionsLog() const {
+const vector<BaseAction *> &WareHouse::getActionsLog() const
+{
     return actionsLog;
 }
 
-void WareHouse::addOrder(Order* order) {
+void WareHouse::addOrder(Order *order)
+{
     pendingOrders.push_back(order);
 }
 
-void WareHouse::addAction(BaseAction* action) {
+void WareHouse::addAction(BaseAction *action)
+{
     actionsLog.push_back(action);
 }
 
-void WareHouse::printActionsLogs() {
-    for (const auto& action : actionsLog) {
+void WareHouse::printActionsLogs()
+{
+    for (const auto &action : actionsLog)
+    {
         action->toString();
     }
 }
 
-Customer &WareHouse::getCustomer(int customerId) const {
-    for (const auto& customer : customers) {
-        if (customer->getId() == customerId) {
+Customer &WareHouse::getCustomer(int customerId) const
+{
+    for (const auto &customer : customers)
+    {
+        if (customer->getId() == customerId)
+        {
             return *customer;
         }
     }
@@ -91,9 +105,12 @@ Customer &WareHouse::getCustomer(int customerId) const {
     return *customers[0];
 }
 
-Volunteer &WareHouse::getVolunteer(int volunteerId) const {
-    for (const auto& volunteer : volunteers) {
-        if (volunteer->getId() == volunteerId) {
+Volunteer &WareHouse::getVolunteer(int volunteerId) const
+{
+    for (const auto &volunteer : volunteers)
+    {
+        if (volunteer->getId() == volunteerId)
+        {
             return *volunteer;
         }
     }
@@ -101,20 +118,24 @@ Volunteer &WareHouse::getVolunteer(int volunteerId) const {
     return *volunteers[0];
 }
 
-Order &WareHouse::getOrder(int orderId) const {
-    for (const auto& order : pendingOrders) {
-        if (order->getId() == orderId) {
+Order &WareHouse::getOrder(int orderId) const
+{
+    for (const auto &order : pendingOrders)
+    {
+        if (order->getId() == orderId)
+        {
             return *order;
         }
     }
-    // Return a default order if not found
-    return *pendingOrders[0];
+    throw std::runtime_error("Order not found with ID: " + std::to_string(orderId));
 }
 
-void WareHouse::close() {
+void WareHouse::close()
+{
     isOpen = false;
 }
 
-void WareHouse::open() {
+void WareHouse::open()
+{
     isOpen = true;
 }
