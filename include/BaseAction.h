@@ -56,7 +56,6 @@ class Order : public BaseAction
 public:
     Order(int id);
     void act(WareHouse &wareHouse) override;
-
     Order *clone() const override;
     string toString() const override;
 

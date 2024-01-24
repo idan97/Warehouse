@@ -160,7 +160,7 @@ PrintActionsLog::PrintActionsLog() {}
 
 void PrintActionsLog::act(WareHouse &wareHouse)
 {
-    wareHouse.printActionsLog();
+    wareHouse.printActionsLogs();
     complete();
 }
 
