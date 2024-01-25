@@ -5,10 +5,10 @@
 #include "../include/Volunteer.h"
 #include "../include/Order.h"
 #include "../include/Customer.h"
-#include "../include/BaseAction.h"
+#include "../include/Action.h"
 #include <iostream>
 
-WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(), volunteers(), pendingOrders(), vol(), completedOrders(), customers(), customerCounter(0), volunteerCounter(0)
+WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), customers(), customerCounter(0), volunteerCounter(0)
 {
     ifstream configFile(configFilePath);
     string line;
@@ -62,14 +62,17 @@ WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(),
 
 void WareHouse::start()
 {
-    if (isOpen){
+    if (isOpen)
+    {
         cout << "Warehouse is open" << endl;
-    }else{
+    }
+    else
+    {
         cout << "Warehouse is closed" << endl;
     }
 }
 
-const vector<BaseAction *> &WareHouse::getActionsLog() const
+const vector<BaseAction *> &WareHouse::getActions() const
 {
     return actionsLog;
 }
@@ -79,16 +82,32 @@ void WareHouse::addOrder(Order *order)
     pendingOrders.push_back(order);
 }
 
+void WareHouse::addOrderByCustomer(int customerId){
+    for (const auto &customer : customers)
+    {
+        if (customer->getId() == customerId)
+        {
+            pendingOrders.push_back(new Order(orderCounter, customerId, customer->getDistance()));
+            orderCounter++;
+            return;
+        }
+    }
+    throw std::runtime_error("Customer not found with ID: " + std::to_string(customerId));
+}
 void WareHouse::addAction(BaseAction *action)
 {
     actionsLog.push_back(action);
 }
 
-void WareHouse::printActionsLogs()
+void WareHouse::addCustomer(string customerName, CustomerType customerType, int distance, int maxOrders)
 {
-    for (const auto &action : actionsLog)
+    if (customerType == CustomerType::Soldier)
     {
-        action->toString();
+        customers.push_back(new SoldierCustomer(customerCounter, customerName, distance, maxOrders));
+    }
+    else
+    {
+        customers.push_back(new CivilianCustomer(customerCounter, customerName, distance, maxOrders));
     }
 }
 
@@ -121,6 +140,20 @@ Volunteer &WareHouse::getVolunteer(int volunteerId) const
 Order &WareHouse::getOrder(int orderId) const
 {
     for (const auto &order : pendingOrders)
+    {
+        if (order->getId() == orderId)
+        {
+            return *order;
+        }
+    }
+    for (const auto &order : vol)
+    {
+        if (order->getId() == orderId)
+        {
+            return *order;
+        }
+    }
+    for (const auto &order : completedOrders)
     {
         if (order->getId() == orderId)
         {

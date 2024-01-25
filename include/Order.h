@@ -5,9 +5,6 @@
 using std::string;
 using std::vector;
 
-
-class Volunteer;
-
 enum class OrderStatus {
     PENDING,
     COLLECTING,
@@ -28,7 +25,6 @@ class Order {
         void setDriverId(int driverId);
         int getCollectorId() const;
         int getDriverId() const;
-        int getDistance() const;
         OrderStatus getStatus() const;
         const string toString() const;
 

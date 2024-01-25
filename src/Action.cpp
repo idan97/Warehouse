@@ -1,5 +1,6 @@
-#include "../include/BaseAction.h"
+#include "../include/Action.h"
 #include <iostream>
+#include "Action.h"
 
 BaseAction::BaseAction() : status(ActionStatus::ERROR) {}
 
@@ -17,7 +18,7 @@ void BaseAction::error(string errorMsg)
 {
     status = ActionStatus::ERROR;
     this->errorMsg = errorMsg;
-    std::cout << "Error: " << errorMsg << std::endl;
+    //std::cout << "Error: " << errorMsg << std::endl;
 }
 
 string BaseAction::getErrorMsg() const
@@ -46,34 +47,38 @@ SimulateStep *SimulateStep::clone() const
     return new SimulateStep(*this);
 }
 
-Order::Order(int id) : customerId(id) {}
+AddOrder::AddOrder(int id) : customerId(id) {}
 
-void Order::act(WareHouse &wareHouse)
+void AddOrder::act(WareHouse &wareHouse)
 {
-    wareHouse.createOrder(customerId);
+    wareHouse.addOrderByCustomer(customerId);
     complete();
 }
 
-Order *Order::clone() const
+AddOrder *AddOrder::clone() const
 {
-    return new Order(*this);
+    return new AddOrder(*this);
 }
 
-string Order::toString() const
+string AddOrder::toString() const
 {
     return "order " + std::to_string(customerId);
 }
 
-AddCustomer::AddCustomer(string customerName, string customerType, int distance, int maxOrders)
-    : customerName(customerName), distance(distance), maxOrders(maxOrders)
+AddCustomer::AddCustomer(const string &customerName, const string &customerType, int distance, int maxOrders)
+    : customerName(customerName), distance(distance), maxOrders(maxOrders), customerType(getCustomerType(customerType))
+{
+}
+
+CustomerType AddCustomer::getCustomerType(const string &customerType)
 {
     if (customerType == "soldier")
     {
-        this->customerType = CustomerType::Soldier;
+        return CustomerType::Soldier;
     }
     else
     {
-        this->customerType = CustomerType::Civilian;
+        return CustomerType::Civilian;
     }
 }
 
