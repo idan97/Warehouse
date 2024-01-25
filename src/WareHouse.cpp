@@ -8,7 +8,7 @@
 #include "../include/Action.h"
 #include <iostream>
 
-WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), customers(), customerCounter(0), volunteerCounter(0)
+WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
     ifstream configFile(configFilePath);
     string line;
@@ -80,20 +80,9 @@ const vector<BaseAction *> &WareHouse::getActions() const
 void WareHouse::addOrder(Order *order)
 {
     pendingOrders.push_back(order);
+    orderCounter++;
 }
 
-void WareHouse::addOrderByCustomer(int customerId){
-    for (const auto &customer : customers)
-    {
-        if (customer->getId() == customerId)
-        {
-            pendingOrders.push_back(new Order(orderCounter, customerId, customer->getDistance()));
-            orderCounter++;
-            return;
-        }
-    }
-    throw std::runtime_error("Customer not found with ID: " + std::to_string(customerId));
-}
 void WareHouse::addAction(BaseAction *action)
 {
     actionsLog.push_back(action);
@@ -109,6 +98,7 @@ void WareHouse::addCustomer(string customerName, CustomerType customerType, int 
     {
         customers.push_back(new CivilianCustomer(customerCounter, customerName, distance, maxOrders));
     }
+    customerCounter++;
 }
 
 Customer &WareHouse::getCustomer(int customerId) const
@@ -171,4 +161,17 @@ void WareHouse::close()
 void WareHouse::open()
 {
     isOpen = true;
+}
+
+int WareHouse::getOrderCounter() const
+{
+    return orderCounter;
+}
+int WareHouse::getCustomerCounter() const
+{
+    return customerCounter;
+}
+int WareHouse::getVolunteerCounter() const
+{
+    return volunteerCounter;
 }

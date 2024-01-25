@@ -58,7 +58,7 @@ class AddOrder : public BaseAction {
 class AddCustomer : public BaseAction {
     public:
         AddCustomer(const string &customerName, const string &customerType, int distance, int maxOrders);
-        CustomerType getCustomerType(const string &customerType);
+        CustomerType getCustomerType(const string &customerType);//added by me
         void act(WareHouse &wareHouse) override;
         AddCustomer *clone() const override;
         string toString() const override;

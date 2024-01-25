@@ -1,8 +1,7 @@
 #include "../include/Action.h"
 #include <iostream>
-#include "Action.h"
 
-BaseAction::BaseAction() : status(ActionStatus::ERROR) {}
+BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
 
 ActionStatus BaseAction::getStatus() const
 {
@@ -18,12 +17,11 @@ void BaseAction::error(string errorMsg)
 {
     status = ActionStatus::ERROR;
     this->errorMsg = errorMsg;
-    //std::cout << "Error: " << errorMsg << std::endl;
 }
 
 string BaseAction::getErrorMsg() const
 {
-    return errorMsg;
+    return "Error: " + errorMsg;
 }
 
 SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
@@ -51,8 +49,20 @@ AddOrder::AddOrder(int id) : customerId(id) {}
 
 void AddOrder::act(WareHouse &wareHouse)
 {
-    wareHouse.addOrderByCustomer(customerId);
-    complete();
+    Customer &cust = wareHouse.getCustomer(customerId);
+    if (cust.getId() >= 0 && cust.canMakeOrder())
+    {
+        int orderCounter = wareHouse.getOrderCounter();
+        wareHouse.addOrder(new Order(orderCounter, customerId, cust.getCustomerDistance()););
+        cust.addOrder(orderCounter);
+        complete();
+    }
+    else
+    {
+        error("Cannot place this order");
+        std::cout << "Cannot place this order" << std::endl;
+    }
+    wareHouse.addAction(this);
 }
 
 AddOrder *AddOrder::clone() const
@@ -86,6 +96,7 @@ void AddCustomer::act(WareHouse &wareHouse)
 {
     wareHouse.addCustomer(customerName, customerType, distance, maxOrders);
     complete();
+    warehouse.addAction(this);
 }
 
 AddCustomer *AddCustomer::clone() const
@@ -95,16 +106,7 @@ AddCustomer *AddCustomer::clone() const
 
 string AddCustomer::toString() const
 {
-    string customerTypeStr;
-    if (customerType == CustomerType::Soldier)
-    {
-        customerTypeStr = "soldier";
-    }
-    else
-    {
-        customerTypeStr = "civilian";
-    }
-    return "customer " + customerName + " " + customerTypeStr + " " + std::to_string(distance) + " " + std::to_string(maxOrders);
+    return "add customer " + customerName;
 }
 
 PrintOrderStatus::PrintOrderStatus(int id) : orderId(id) {}
