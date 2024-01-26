@@ -15,6 +15,7 @@ class WareHouse {
 
     public:
         WareHouse(const string &configFilePath);
+        WareHouse(const WareHouse& other);
         void start();
         void addOrder(Order* order);
         bool addOrderByCustomer(int customerId);
@@ -29,6 +30,13 @@ class WareHouse {
         int getOrderCounter() const;
         int getCustomerCounter() const;
         int getVolunteerCounter() const;
+        void setOpenStatus(bool status);
+        static Order emptyOrder; //For returning a null order
+        static SoldierCustomer emptyCustomer; //For returning a null customer
+        static CollectorVolunteer emptyVolunteer; //For returning a null volunteer   
+        void printAndDeleteAllOrders() ;//added by me
+        string buildOrderInfo(const Order &order) const;//added by me
+        void clearVolunteersAndCustomers();//added by me
 
     private:
         bool isOpen;
@@ -40,4 +48,5 @@ class WareHouse {
         vector<Customer*> customers;
         int customerCounter; //For assigning unique customer IDs
         int volunteerCounter; //For assigning unique volunteer IDs
-        int orderCounter; //For assigning unique order IDs
+        int orderCounter; //For assigning unique order IDs   
+};

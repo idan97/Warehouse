@@ -7,8 +7,13 @@
 #include "../include/Customer.h"
 #include "../include/Action.h"
 #include <iostream>
+extern WareHouse *backup;
 
-WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
+Order WareHouse::emptyOrder(-1, -1, -1);
+SoldierCustomer WareHouse::emptyCustomer(-1, "", -1, -1);
+CollectorVolunteer WareHouse::emptyVolunteer(-1, "", -1);
+
+WareHouse::WareHouse(const string &configFilePath) : isOpen(true), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
     ifstream configFile(configFilePath);
     string line;
@@ -57,6 +62,34 @@ WareHouse::WareHouse(const string &configFilePath) : isOpen(true), actionsLog(),
             }
             volunteerCounter++;
         }
+    }
+}
+
+WareHouse::WareHouse(const WareHouse &other) : isOpen(other.isOpen), customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter)
+{
+    for (auto &customer : other.customers)
+    {
+        customers.push_back(customer->clone());
+    }
+    for (auto &volunteer : other.volunteers)
+    {
+        volunteers.push_back(volunteer->clone());
+    }
+    for (auto &order : other.pendingOrders)
+    {
+        pendingOrders.push_back(order->clone());
+    }
+    for (auto &order : other.inProcessOrders)
+    {
+        inProcessOrders.push_back(order->clone());
+    }
+    for (auto &order : other.completedOrders)
+    {
+        completedOrders.push_back(order->clone());
+    }
+    for (auto &action : other.actionsLog)
+    {
+        actionsLog.push_back(action->clone());
     }
 }
 
@@ -136,7 +169,7 @@ Order &WareHouse::getOrder(int orderId) const
             return *order;
         }
     }
-    for (const auto &order : vol)
+    for (const auto &order : inProcessOrders)
     {
         if (order->getId() == orderId)
         {
@@ -150,7 +183,7 @@ Order &WareHouse::getOrder(int orderId) const
             return *order;
         }
     }
-    throw std::runtime_error("Order not found with ID: " + std::to_string(orderId));
+    return emptyOrder;
 }
 
 void WareHouse::close()
@@ -174,4 +207,52 @@ int WareHouse::getCustomerCounter() const
 int WareHouse::getVolunteerCounter() const
 {
     return volunteerCounter;
+}
+void WareHouse::setOpenStatus(bool status)
+{
+    isOpen = status;
+}
+
+void WareHouse::printAndDeleteAllOrders()
+{
+    for (auto &order : pendingOrders)
+    {
+        std::cout << buildOrderInfo(*order) << std::endl;
+        delete order;
+    }
+    for (auto &order : inProcessOrders)
+    {
+        std::cout << buildOrderInfo(*order) << std::endl;
+        delete order;
+    }
+    for (auto &order : completedOrders)
+    {
+std::cout << buildOrderInfo(*order) << std::endl;
+        delete order;
+    }
+    pendingOrders.clear();
+    inProcessOrders.clear();
+    completedOrders.clear();
+}
+
+string WareHouse::buildOrderInfo(const Order &order) const
+{
+    string orderInfo = "OrderID: " + std::to_string(order.getId()) +
+                       " , CustomerID: " + std::to_string(order.getCustomerId()) +
+                       ", OrderStatus: " + order.getStatusString();
+    return orderInfo;
+}
+
+void WareHouse::clearVolunteersAndCustomers()
+{
+    for (auto &volunteer : volunteers)
+    {
+        delete volunteer;
+    }
+    for (auto &customer : customers)
+    {
+        delete customer;
+    }
+    volunteers.clear();
+    customers.clear();
 }

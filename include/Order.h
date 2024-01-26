@@ -27,6 +27,8 @@ class Order {
         int getDriverId() const;
         OrderStatus getStatus() const;
         const string toString() const;
+        const string getStatusString() const;//added by me
+        Order* clone() const;//added by me
 
     private:
         const int id;
