@@ -47,62 +47,53 @@ SimulateStep::SimulateStep(const SimulateStep &other) : numOfSteps(other.numOfSt
 
 void SimulateStep::act(WareHouse &wareHouse)
 {
+    vector<Order *> pendingOrders = wareHouse.getPendingOrders();
+    vector<Order *> inProcessOrders = wareHouse.getInProcessOrders();
+    vector<Volunteer *> volunteers = wareHouse.getVolunteers();
+
     // Stage 1: Go through pendingOrders and hand them over to the next operation
-    for (auto &order : wareHouse.getPendingOrders())
+    for (auto it = pendingOrders.begin(); it != pendingOrders.end();)
     {
-        if (order.getStatus() == OrderStatus::PENDING)
+        Order order = *(*it);
+        for (Volunteer *v : volunteers)
         {
-            // Assign orders to collectors and drivers based on their status and availability
-            Volunteer *volunteer = nullptr;
-            for (Volunteer *v : wareHouse.getVolunteers())
+            if ((v->getVolunteerType() == "Collector" || v->getVolunteerType() == "LimitedCollector") &&
+                v->canTakeOrder(order))
             {
-                if (v->getStatus() == VolunteerStatus::AVAILABLE)
-                {
-                    if (v->getType() == VolunteerType::COLLECTOR)
-                    {
-                        volunteer = v;
-                        break;
-                    }
-                    else if (v->getType() == VolunteerType::DRIVER)
-                    {
-                        if (volunteer == nullptr)
-                        {
-                            volunteer = v;
-                        }
-                        else if (volunteer->getType() == VolunteerType::COLLECTOR)
-                        {
-                            volunteer = v;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Your logic to associate orders with volunteers goes here
-            // Use wareHouse.getCollectorVolunteer(), wareHouse.getDriverVolunteer(), etc.
-
-            if (volunteer != nullptr)
-            {
-                order.setStatus(OrderStatus::COLLECTING); // Update order status
-                volunteer->acceptOrder(*order);           // Assign the order to the volunteer
-                wareHouse.moveOrderToInProcess(*order);   // Move order to inProcessOrders
+                v->acceptOrder(order);
+                order.setStatus(OrderStatus::COLLECTING);
+                order.setCollectorId(v->getId());
+                it = pendingOrders.erase(it); // erase returns the iterator to the next element
+                break;
             }
         }
     }
 
-    // Stage 2: Perform a step in the simulation
-    for (Volunteer *volunteer : wareHouse.getVolunteers())
+    // Your logic to associate orders with volunteers goes here
+    // Use wareHouse.getCollectorVolunteer(), wareHouse.getDriverVolunteer(), etc.
+
+    if (volunteer != nullptr)
     {
-        volunteer->step(); // Decrease timeLeft for collectors
+        order.setStatus(OrderStatus::COLLECTING); // Update order status
+        volunteer->acceptOrder(*order);           // Assign the order to the volunteer
+        wareHouse.moveOrderToInProcess(*order);   // Move order to inProcessOrders
     }
+}
+}
 
-    // Stage 3: Check if volunteers have finished their job
-    wareHouse.checkVolunteersAndPushOrders();
+// Stage 2: Perform a step in the simulation
+for (Volunteer *volunteer : wareHouse.getVolunteers())
+{
+    volunteer->step(); // Decrease timeLeft for collectors
+}
 
-    // Stage 4: Delete volunteers that reached maxOrders limit
-    wareHouse.deleteVolunteersWithMaxOrders();
+// Stage 3: Check if volunteers have finished their job
+wareHouse.checkVolunteersAndPushOrders();
 
-    complete();
+// Stage 4: Delete volunteers that reached maxOrders limit
+wareHouse.deleteVolunteersWithMaxOrders();
+
+complete();
 }
 
 std::string SimulateStep::toString() const

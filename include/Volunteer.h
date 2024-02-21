@@ -23,6 +23,7 @@ class Volunteer {
 
         virtual string toString() const = 0;
         virtual Volunteer* clone() const = 0; //Return a copy of the volunteer
+        virtual string getVolunteerType() const = 0; //Return the type of the volunteer
 
     protected:
         int completedOrderId; //Initialized to NO_ORDER if no order has been completed yet
@@ -48,6 +49,7 @@ class CollectorVolunteer: public Volunteer {
         bool canTakeOrder(const Order &order) const override;
         void acceptOrder(const Order &order) override;
         string toString() const override;
+        string getVolunteerType() const override;
     
     private:
         const int coolDown; // The time it takes the volunteer to process an order
@@ -66,6 +68,7 @@ class LimitedCollectorVolunteer: public CollectorVolunteer {
         int getMaxOrders() const;
         int getNumOrdersLeft() const;
         string toString() const override;
+        string getVolunteerType() const override;
     
     private:
         const int maxOrders; // The number of orders the volunteer can process in the whole simulation
@@ -87,6 +90,7 @@ class DriverVolunteer: public Volunteer {
         void acceptOrder(const Order &order) override; // Assign distanceLeft to order's distance
         void step() override; // Decrease distanceLeft by distancePerStep
         string toString() const override;
+        string getVolunteerType() const override;
 
     private:
         const int maxDistance; // The maximum distance of ANY order the volunteer can take
@@ -105,6 +109,7 @@ class LimitedDriverVolunteer: public DriverVolunteer {
         bool canTakeOrder(const Order &order) const override; // Signal if the volunteer is not busy, the order is within the maxDistance.
         void acceptOrder(const Order &order) override; // Assign distanceLeft to order's distance and decrease ordersLeft
         string toString() const override;
+        string getVolunteerType() const override;
 
     private:
         const int maxOrders; // The number of orders the volunteer can process in the whole simulation

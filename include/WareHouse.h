@@ -37,6 +37,10 @@ class WareHouse {
         void printAndDeleteAllOrders() ;//added by me
         string buildOrderInfo(const Order &order) const;//added by me
         void clearVolunteersAndCustomers();//added by me
+        vector<Order*> getPendingOrders() const;
+        vector<Order*> getInProcessOrders() const;
+        vector<Volunteer*> getVolunteers() const;
+
 
     private:
         bool isOpen;

@@ -108,6 +108,11 @@ string CollectorVolunteer::toString() const
     return info;
 }
 
+string CollectorVolunteer::getVolunteerType() const
+{
+    return "Collector";
+}
+
 LimitedCollectorVolunteer::LimitedCollectorVolunteer(int id, string name, int coolDown, int maxOrders)
     : CollectorVolunteer(id, name, coolDown), maxOrders(maxOrders), ordersLeft(maxOrders) {}
 
@@ -161,6 +166,10 @@ string LimitedCollectorVolunteer::toString() const
     return info;
 }
 
+string LimitedCollectorVolunteer::getVolunteerType() const
+{
+    return "LimitedCollector";
+}
 
 DriverVolunteer::DriverVolunteer(int id, string name, int maxDistance, int distancePerStep)
     : Volunteer(id, name), maxDistance(maxDistance), distancePerStep(distancePerStep), distanceLeft(0) {}
@@ -243,6 +252,10 @@ string DriverVolunteer::toString() const
     return info;
 }
 
+string DriverVolunteer::getVolunteerType() const
+{
+    return "Driver";
+}
 
 LimitedDriverVolunteer::LimitedDriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep, int maxOrders)
     : DriverVolunteer(id, name, maxDistance, distancePerStep), maxOrders(maxOrders), ordersLeft(maxOrders) {}
@@ -295,4 +308,9 @@ string LimitedDriverVolunteer::toString() const
     }
     info += "OrdersLeft :" + std::to_string(getNumOrdersLeft()) ;
     return info;
+}
+
+string LimitedDriverVolunteer::getVolunteerType() const
+{
+    return "LimitedDriver";
 }

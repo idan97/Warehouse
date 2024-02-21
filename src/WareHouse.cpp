@@ -256,3 +256,16 @@ void WareHouse::clearVolunteersAndCustomers()
     volunteers.clear();
     customers.clear();
 }
+
+vector<Order *> WareHouse::getPendingOrders() const
+{
+    return pendingOrders;
+}   
+vector<Order *> WareHouse::getInProcessOrders() const
+{
+    return inProcessOrders;
+}   
+vector<Volunteer *> WareHouse::getVolunteers() const
+{
+    return volunteers;
+}
