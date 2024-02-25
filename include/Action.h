@@ -97,7 +97,6 @@ class PrintCustomerStatus: public BaseAction {
         const int customerId;
 };
 
-
 class PrintVolunteerStatus : public BaseAction {
     public:
         PrintVolunteerStatus(int id);

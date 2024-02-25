@@ -31,7 +31,7 @@ bool Customer::canMakeOrder() const {
     return getNumOrders() < maxOrders;
 }
 
-vector<int>& Customer::getOrders() const {
+const vector<int>& Customer::getOrdersIds() const {
     return ordersId;
 }
 
@@ -44,14 +44,14 @@ int Customer::addOrder(int orderId) {
 }
 
 
-SoldierCustomer::SoldierCustomer(int id, string name, int locationDistance, int maxOrders)
+SoldierCustomer::SoldierCustomer(int id, const string &name, int locationDistance, int maxOrders)
     : Customer(id, name, locationDistance, maxOrders) {}
 
 SoldierCustomer* SoldierCustomer::clone() const {
     return new SoldierCustomer(*this);
 }
 
-CivilianCustomer::CivilianCustomer(int id, string name, int locationDistance, int maxOrders)
+CivilianCustomer::CivilianCustomer(int id, const string &name, int locationDistance, int maxOrders)
     : Customer(id, name, locationDistance, maxOrders) {}
 
 CivilianCustomer* CivilianCustomer::clone() const {

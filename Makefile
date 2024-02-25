@@ -21,4 +21,4 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(COMPILER_CMD) -c $< -o $@
 
 clean:
-	find $(BIN_DIR) -maxdepth 1 -type f -exec rm -f {} \;
+	mkdir -p $(BIN_DIR) && find $(BIN_DIR) -maxdepth 1 -type f -exec rm -f {} \;

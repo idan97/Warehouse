@@ -64,6 +64,7 @@ void SimulateStep::act(WareHouse &wareHouse)
                 order.setStatus(OrderStatus::COLLECTING);
                 order.setCollectorId(v->getId());
                 it = pendingOrders.erase(it); // erase returns the iterator to the next element
+                inProcessOrders.push_back(&order);
                 break;
             }
         }
@@ -79,7 +80,7 @@ void SimulateStep::act(WareHouse &wareHouse)
         wareHouse.moveOrderToInProcess(*order);   // Move order to inProcessOrders
     }
 }
-}
+
 
 // Stage 2: Perform a step in the simulation
 for (Volunteer *volunteer : wareHouse.getVolunteers())
@@ -306,9 +307,9 @@ Close::Close(const Close &other) : BaseAction(other) {}
 
 void Close::act(WareHouse &wareHouse)
 {
-    wareHouse.printAndDeleteAllOrders();
+    wareHouse.printAllOrders();
+    wareHouse.clearWareHouse(); // Free all memory
     wareHouse.setOpenStatus(false);
-    wareHouse.clearVolunteersAndCustomers(); // Free all memory
     complete();
     // exit(0); // Finish the program
 }
@@ -330,7 +331,7 @@ BackupWareHouse::BackupWareHouse(const BackupWareHouse &other) : BaseAction(othe
 void BackupWareHouse::act(WareHouse &wareHouse)
 {
     // Create a new WareHouse object and copy the state of wareHouse into it
-    backup = new WareHouse(wareHouse);
+    WareHouse backup = new WareHouse(wareHouse);
     complete();
     wareHouse.addAction(this);
 }

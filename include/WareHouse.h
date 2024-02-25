@@ -15,7 +15,11 @@ class WareHouse {
 
     public:
         WareHouse(const string &configFilePath);
-        WareHouse(const WareHouse& other);
+        WareHouse(const WareHouse& other); //copy constructor
+        WareHouse(WareHouse&& other);//move constructor
+        WareHouse& operator=(const WareHouse& other);//copy assignment operator
+        WareHouse& operator=(WareHouse&& other);//move assignment operator
+        ~WareHouse();//destructor  
         void start();
         void addOrder(Order* order);
         bool addOrderByCustomer(int customerId);
@@ -34,13 +38,14 @@ class WareHouse {
         static Order emptyOrder; //For returning a null order
         static SoldierCustomer emptyCustomer; //For returning a null customer
         static CollectorVolunteer emptyVolunteer; //For returning a null volunteer   
-        void printAndDeleteAllOrders() ;//added by me
+        void printAllOrders() ;//added by me
         string buildOrderInfo(const Order &order) const;//added by me
-        void clearVolunteersAndCustomers();//added by me
+        void clearWareHouse();//added by me
         vector<Order*> getPendingOrders() const;
         vector<Order*> getInProcessOrders() const;
         vector<Volunteer*> getVolunteers() const;
-
+        void readFirstInput();//added by me
+        void processUserInput();//added by me
 
     private:
         bool isOpen;
@@ -53,4 +58,5 @@ class WareHouse {
         int customerCounter; //For assigning unique customer IDs
         int volunteerCounter; //For assigning unique volunteer IDs
         int orderCounter; //For assigning unique order IDs   
+        string configFilePath;
 };
