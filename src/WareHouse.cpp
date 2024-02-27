@@ -70,11 +70,11 @@ WareHouse &WareHouse::operator=(const WareHouse &other) // copy assignment opera
 {
     if (this != &other)
     {
+        clearWareHouse();
         isOpen = other.isOpen;
         customerCounter = other.customerCounter;
         volunteerCounter = other.volunteerCounter;
         orderCounter = other.orderCounter;
-        clearWareHouse();
         for (auto &customer : other.customers)
         {
             customers.push_back(customer->clone());
@@ -131,7 +131,7 @@ void WareHouse::start()
 {
     open();
     std::cout << "Warehouse is open!" << std::endl;
-    // readInput();?
+    processUserInput();
 }
 
 const vector<BaseAction *> &WareHouse::getActions() const
@@ -150,15 +150,15 @@ void WareHouse::addAction(BaseAction *action)
     actionsLog.push_back(action);
 }
 
-void WareHouse::addCustomer(string customerName, CustomerType customerType, int distance, int maxOrders)
+void WareHouse::addCustomer(const string &name, const string &type, int distance, int maxOrders)
 {
-    if (customerType == CustomerType::Soldier)
+    if (type == "soldier")
     {
-        customers.push_back(new SoldierCustomer(customerCounter, customerName, distance, maxOrders));
+        customers.push_back(new SoldierCustomer(customerCounter, name, distance, maxOrders));
     }
     else
     {
-        customers.push_back(new CivilianCustomer(customerCounter, customerName, distance, maxOrders));
+        customers.push_back(new CivilianCustomer(customerCounter, name, distance, maxOrders));
     }
     customerCounter++;
 }
@@ -455,7 +455,8 @@ void WareHouse::processUserInput()
         else if (actionType == "backup")
         {
             BackupWareHouse *backup = new BackupWareHouse();
-            backup->act(*this);
+            WareHouse &send = *this;
+            backup->act(send);
         }
         else if (actionType == "restore")
         {
@@ -465,6 +466,36 @@ void WareHouse::processUserInput()
         else
         {
             cout << "error: not a valid command" << endl;
+        }
+    }
+}
+
+void WareHouse::removeVolunteer(int volunteerId)
+{
+    for (auto v = volunteers.begin(); v != volunteers.end(); ++v)
+    {
+        if ((*v)->getId() == volunteerId)
+        {
+            delete *v;
+            volunteers.erase(v);
+            break;
+        }
+    }
+}
+
+vector<Order *> WareHouse::getCompletedOrders() const
+{
+    return completedOrders;
+}
+
+void WareHouse::eraseOrderFromInProcess(int orderId)
+{
+    for (auto o = inProcessOrders.begin(); o != inProcessOrders.end(); ++o)
+    {
+        if ((*o)->getId() == orderId)
+        {
+            inProcessOrders.erase(o);
+            break;
         }
     }
 }

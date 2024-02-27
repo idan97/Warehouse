@@ -47,54 +47,81 @@ SimulateStep::SimulateStep(const SimulateStep &other) : numOfSteps(other.numOfSt
 
 void SimulateStep::act(WareHouse &wareHouse)
 {
-    vector<Order *> pendingOrders = wareHouse.getPendingOrders();
-    vector<Order *> inProcessOrders = wareHouse.getInProcessOrders();
-    vector<Volunteer *> volunteers = wareHouse.getVolunteers();
-
-    // Stage 1: Go through pendingOrders and hand them over to the next operation
-    for (auto it = pendingOrders.begin(); it != pendingOrders.end();)
+    for (int i = 0; i < numOfSteps; i++)
     {
-        Order order = *(*it);
+        vector<Order *> pendingOrders = wareHouse.getPendingOrders();
+        vector<Order *> inProcessOrders = wareHouse.getInProcessOrders();
+        vector <Order *> completedOrders = wareHouse.getCompletedOrders();
+        vector<Volunteer *> volunteers = wareHouse.getVolunteers();
+
+        // Stage 1: assign pending orders to volunteers
+        for (auto it = pendingOrders.begin(); it != pendingOrders.end();)
+        {
+            Order order = *(*it);
+            if (order.getStatus() == OrderStatus::PENDING)
+            {
+                for (Volunteer *v : volunteers)
+                {
+                    if ((v->getVolunteerType() == "Collector" || v->getVolunteerType() == "LimitedCollector") &&
+                        v->canTakeOrder(order))
+                    {
+                        v->acceptOrder(order);
+                        order.setStatus(OrderStatus::COLLECTING);
+                        order.setCollectorId(v->getId());
+                        it = pendingOrders.erase(it); // erase returns the iterator to the next element
+                        inProcessOrders.push_back(&order);
+                        break;
+                    }
+                }
+            }
+            else if (order.getStatus() == OrderStatus::COLLECTING)
+            {
+                for (Volunteer *v : volunteers)
+                {
+                    if (v->getVolunteerType() == "Driver" || v->getVolunteerType() == "LimitedDriver" &&
+                                                                 v->canTakeOrder(order))
+                    {
+                        v->acceptOrder(order);
+                        order.setStatus(OrderStatus::DELIVERING);
+                        order.setCollectorId(v->getId());
+                        it = pendingOrders.erase(it); // erase returns the iterator to the next element
+                        inProcessOrders.push_back(&order);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Stage 2 : make 1 step for all busy volunteers
         for (Volunteer *v : volunteers)
         {
-            if ((v->getVolunteerType() == "Collector" || v->getVolunteerType() == "LimitedCollector") &&
-                v->canTakeOrder(order))
+            if (v->isBusy())
             {
-                v->acceptOrder(order);
-                order.setStatus(OrderStatus::COLLECTING);
-                order.setCollectorId(v->getId());
-                it = pendingOrders.erase(it); // erase returns the iterator to the next element
-                inProcessOrders.push_back(&order);
-                break;
+                Order &order = wareHouse.getOrder(v->getActiveOrderId());
+                v->step();
+                if (v->isBusy() == false){ //volunteer finished his task
+                    if (v->hasOrdersLeft() == false){ // volunteer reached his max orders
+                        wareHouse.removeVolunteer(v->getId());
+                    }
+                    if (order.getStatus() == OrderStatus::COLLECTING)//move to pendingList
+                    {
+                        order.setStatus(OrderStatus::DELIVERING);
+                        pendingOrders.push_back(&order);
+                    }
+                    else if (order.getStatus() == OrderStatus::DELIVERING)//move to completedList
+                    {
+                        order.setStatus(OrderStatus::COMPLETED);
+                        completedOrders.push_back(&order);
+                    }
+                    wareHouse.eraseOrderFromInProcess(order.getId());
+                }
             }
         }
     }
 
-    // Your logic to associate orders with volunteers goes here
-    // Use wareHouse.getCollectorVolunteer(), wareHouse.getDriverVolunteer(), etc.
+    complete();
+    wareHouse.addAction(this);
 
-    if (volunteer != nullptr)
-    {
-        order.setStatus(OrderStatus::COLLECTING); // Update order status
-        volunteer->acceptOrder(*order);           // Assign the order to the volunteer
-        wareHouse.moveOrderToInProcess(*order);   // Move order to inProcessOrders
-    }
-}
-
-
-// Stage 2: Perform a step in the simulation
-for (Volunteer *volunteer : wareHouse.getVolunteers())
-{
-    volunteer->step(); // Decrease timeLeft for collectors
-}
-
-// Stage 3: Check if volunteers have finished their job
-wareHouse.checkVolunteersAndPushOrders();
-
-// Stage 4: Delete volunteers that reached maxOrders limit
-wareHouse.deleteVolunteersWithMaxOrders();
-
-complete();
 }
 
 std::string SimulateStep::toString() const
@@ -117,7 +144,7 @@ void AddOrder::act(WareHouse &wareHouse)
     if (cust.getId() >= 0 && cust.canMakeOrder())
     {
         int orderCounter = wareHouse.getOrderCounter();
-        wareHouse.addOrder(new Order(orderCounter, customerId, cust.getCustomerDistance()););
+        wareHouse.addOrder(new Order(orderCounter, customerId, cust.getCustomerDistance()));
         cust.addOrder(orderCounter);
         complete();
     }
@@ -162,9 +189,16 @@ CustomerType AddCustomer::getCustomerType(const string &customerType)
 
 void AddCustomer::act(WareHouse &wareHouse)
 {
-    wareHouse.addCustomer(customerName, customerType, distance, maxOrders);
+    if (customerType == CustomerType::Soldier)
+    {
+        wareHouse.addCustomer(customerName, "soldier", distance, maxOrders);
+    }
+    else
+    {
+        wareHouse.addCustomer(customerName, "civilian", distance, maxOrders);
+    }
     complete();
-    warehouse.addAction(this);
+    wareHouse.addAction(this);
 }
 
 AddCustomer *AddCustomer::clone() const
@@ -331,7 +365,13 @@ BackupWareHouse::BackupWareHouse(const BackupWareHouse &other) : BaseAction(othe
 void BackupWareHouse::act(WareHouse &wareHouse)
 {
     // Create a new WareHouse object and copy the state of wareHouse into it
-    WareHouse backup = new WareHouse(wareHouse);
+    if (backup != nullptr)
+    {
+        delete backup;
+        backup = nullptr;
+    }
+
+    backup = new WareHouse(wareHouse);
     complete();
     wareHouse.addAction(this);
 }
@@ -357,6 +397,8 @@ void RestoreWareHouse::act(WareHouse &wareHouse)
         // Copy the state of backup into wareHouse
         wareHouse = *backup;
         complete();
+        delete backup; // Free the memory used by backup
+        backup = nullptr;
     }
     else
     {

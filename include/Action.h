@@ -2,9 +2,12 @@
 #include <string>
 #include <vector>
 #include "WareHouse.h"
+#include "Volunteer.h"
+#include "Order.h"
+#include "Customer.h"
 using std::string;
 using std::vector;
-
+class WareHouse;
 enum class ActionStatus{
     COMPLETED, ERROR
 };
@@ -12,7 +15,6 @@ enum class ActionStatus{
 enum class CustomerType{
     Soldier, Civilian
 };
-
 
 class BaseAction{
     public:
@@ -41,7 +43,7 @@ class SimulateStep : public BaseAction {
     public:
         SimulateStep(int numOfSteps);
         SimulateStep(const SimulateStep& other);
-        void act(WareHouse &wareHouse) override;
+        void act(WareHouse& wareHouse) override;
         std::string toString() const override;
         SimulateStep *clone() const override;
 
@@ -79,7 +81,7 @@ class PrintOrderStatus : public BaseAction {
     public:
         PrintOrderStatus(int id);
         PrintOrderStatus(const PrintOrderStatus& other);
-        void act(WareHouse &wareHouse) override;
+        void act(WareHouse& wareHouse) override;
         PrintOrderStatus *clone() const override;
         string toString() const override;
     private:
