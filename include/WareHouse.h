@@ -43,25 +43,25 @@ public:
     void printAllOrders();                           // added by me
     string buildOrderInfo(const Order &order) const; // added by me
     void clearWareHouse();                           // added by me
-    vector<Order *> &getPendingOrders() ;
-    vector<Order *> &getInProcessOrders() ;
-    vector<Order *> &getCompletedOrders() ;
-    vector<Volunteer *> &getVolunteers() ;
-    void readFirstInput();   // added by me
-    void processUserInput(); // added by me
-    void removeVolunteer(int volunteerId); // added by me
+    vector<Order *> &getPendingOrders();
+    vector<Order *> &getInProcessOrders();
+    vector<Order *> &getCompletedOrders();
+    vector<Volunteer *> &getVolunteers();
+    void readFirstInput();                     // added by me
+    void processUserInput();                   // added by me
+    void removeVolunteer(int volunteerId);     // added by me
     void eraseOrderFromInProcess(int orderId); // added by me
 
 private:
     bool isOpen;
-    vector<BaseAction *> actionsLog;
-    vector<Volunteer *> volunteers;
-    vector<Order *> pendingOrders;
-    vector<Order *> inProcessOrders;
-    vector<Order *> completedOrders;
-    vector<Customer *> customers;
     int customerCounter;  // For assigning unique customer IDs
     int volunteerCounter; // For assigning unique volunteer IDs
     int orderCounter;     // For assigning unique order IDs
     string configFilePath;
+    vector<Customer *> customers;
+    vector<Volunteer *> volunteers;
+    vector<Order *> pendingOrders;
+    vector<Order *> inProcessOrders;
+    vector<Order *> completedOrders;
+    vector<BaseAction *> actionsLog;
 };

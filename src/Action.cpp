@@ -4,9 +4,9 @@
 #include <iostream>
 extern WareHouse *backup;
 
-BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
+BaseAction::BaseAction() : errorMsg(""), status(ActionStatus::ERROR) {}
 
-BaseAction::BaseAction(const BaseAction &other) : status(other.status), errorMsg(other.errorMsg) {}
+BaseAction::BaseAction(const BaseAction &other) : errorMsg(other.errorMsg), status(other.status) {}
 
 ActionStatus BaseAction::getStatus() const
 {
@@ -43,7 +43,7 @@ string BaseAction::statusToString() const
 
 SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
 
-SimulateStep::SimulateStep(const SimulateStep &other) : numOfSteps(other.numOfSteps), BaseAction(other) {}
+SimulateStep::SimulateStep(const SimulateStep &other) : BaseAction(other), numOfSteps(other.numOfSteps) {}
 
 void SimulateStep::act(WareHouse &wareHouse)
 {
@@ -152,7 +152,7 @@ SimulateStep *SimulateStep::clone() const
 
 AddOrder::AddOrder(int id) : customerId(id) {}
 
-AddOrder::AddOrder(const AddOrder &other) : customerId(other.customerId), BaseAction(other) {}
+AddOrder::AddOrder(const AddOrder &other) : BaseAction(other), customerId(other.customerId) {}
 
 void AddOrder::act(WareHouse &wareHouse)
 {
@@ -183,13 +183,10 @@ string AddOrder::toString() const
 }
 
 AddCustomer::AddCustomer(const string &customerName, const string &customerType, int distance, int maxOrders)
-    : customerName(customerName), distance(distance), maxOrders(maxOrders), customerType(getCustomerType(customerType))
-{
-}
+    : customerName(customerName), customerType(getCustomerType(customerType)), distance(distance), maxOrders(maxOrders) {}
 
 AddCustomer::AddCustomer(const AddCustomer &other)
-    : customerName(other.customerName), distance(other.distance), maxOrders(other.maxOrders),
-      customerType(other.customerType), BaseAction(other) {}
+    : BaseAction(other), customerName(other.customerName), customerType(other.customerType), distance(other.distance), maxOrders(other.maxOrders) {}
 
 CustomerType AddCustomer::getCustomerType(const string &customerType)
 {
@@ -229,7 +226,7 @@ string AddCustomer::toString() const
 
 PrintOrderStatus::PrintOrderStatus(int id) : orderId(id) {}
 
-PrintOrderStatus::PrintOrderStatus(const PrintOrderStatus &other) : orderId(other.orderId), BaseAction(other) {}
+PrintOrderStatus::PrintOrderStatus(const PrintOrderStatus &other) : BaseAction(other), orderId(other.orderId) {}
 
 void PrintOrderStatus::act(WareHouse &wareHouse)
 {
@@ -259,7 +256,7 @@ string PrintOrderStatus::toString() const
 
 PrintCustomerStatus::PrintCustomerStatus(int customerId) : customerId(customerId) {}
 
-PrintCustomerStatus::PrintCustomerStatus(const PrintCustomerStatus &other) : customerId(other.customerId), BaseAction(other) {}
+PrintCustomerStatus::PrintCustomerStatus(const PrintCustomerStatus &other) : BaseAction(other), customerId(other.customerId) {}
 
 void PrintCustomerStatus::act(WareHouse &wareHouse)
 {
@@ -298,7 +295,7 @@ string PrintCustomerStatus::toString() const
 
 PrintVolunteerStatus::PrintVolunteerStatus(int id) : volunteerId(id) {}
 
-PrintVolunteerStatus::PrintVolunteerStatus(const PrintVolunteerStatus &other) : volunteerId(other.volunteerId), BaseAction(other) {}
+PrintVolunteerStatus::PrintVolunteerStatus(const PrintVolunteerStatus &other) : BaseAction(other), volunteerId(other.volunteerId) {}
 
 void PrintVolunteerStatus::act(WareHouse &wareHouse)
 {
@@ -358,10 +355,9 @@ Close::Close(const Close &other) : BaseAction(other) {}
 void Close::act(WareHouse &wareHouse)
 {
     wareHouse.printAllOrders();
+    wareHouse.addAction(this);
     wareHouse.clearWareHouse(); // Free all memory
     wareHouse.setOpenStatus(false);
-    complete();
-    // exit(0); // Finish the program
 }
 
 Close *Close::clone() const

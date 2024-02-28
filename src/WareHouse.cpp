@@ -16,14 +16,16 @@ Order WareHouse::emptyOrder(-1, -1, -1);
 SoldierCustomer WareHouse::emptyCustomer(-1, "", -1, -1);
 CollectorVolunteer WareHouse::emptyVolunteer(-1, "", -1);
 
-WareHouse::WareHouse(const string &configFilePath) // constructor
-    : isOpen(true), customerCounter(0), volunteerCounter(0), orderCounter(0), configFilePath(configFilePath)
+WareHouse::WareHouse(const string &configFilePath)
+    : isOpen(true), customerCounter(0), volunteerCounter(0), orderCounter(0), configFilePath(configFilePath), customers(), volunteers(),
+      pendingOrders(), inProcessOrders(), completedOrders(), actionsLog()
 {
     readFirstInput();
 }
 
 WareHouse::WareHouse(const WareHouse &other) // copy constructor
-    : isOpen(other.isOpen), customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter)
+    : isOpen(other.isOpen), customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter), configFilePath(other.configFilePath), customers(), volunteers(),
+      pendingOrders(), inProcessOrders(), completedOrders(), actionsLog()
 {
     for (auto &customer : other.customers)
     {
@@ -53,16 +55,17 @@ WareHouse::WareHouse(const WareHouse &other) // copy constructor
 
 WareHouse::WareHouse(WareHouse &&other) : // move constructor
                                           isOpen(other.isOpen),
-                                          actionsLog(std::move(other.actionsLog)),
+                                          customerCounter(other.customerCounter),
+                                          volunteerCounter(other.volunteerCounter),
+                                          orderCounter(other.orderCounter),
+                                          configFilePath(other.configFilePath),
+                                          customers(std::move(other.customers)),
                                           volunteers(std::move(other.volunteers)),
                                           pendingOrders(std::move(other.pendingOrders)),
                                           inProcessOrders(std::move(other.inProcessOrders)),
                                           completedOrders(std::move(other.completedOrders)),
-                                          customers(std::move(other.customers)),
-                                          configFilePath(other.configFilePath),
-                                          customerCounter(other.customerCounter),
-                                          volunteerCounter(other.volunteerCounter),
-                                          orderCounter(other.orderCounter)
+                                          actionsLog(std::move(other.actionsLog))
+
 {
 }
 
@@ -300,7 +303,7 @@ void WareHouse::clearWareHouse()
     actionsLog.clear();
 }
 
-vector<Order *>& WareHouse::getPendingOrders() 
+vector<Order *> &WareHouse::getPendingOrders()
 {
     return pendingOrders;
 }
@@ -308,7 +311,7 @@ vector<Order *> &WareHouse::getInProcessOrders()
 {
     return inProcessOrders;
 }
-vector<Volunteer *>& WareHouse::getVolunteers() 
+vector<Volunteer *> &WareHouse::getVolunteers()
 {
     return volunteers;
 }
@@ -457,7 +460,7 @@ void WareHouse::processUserInput()
         {
             Close *close = new Close();
             close->act(*this);
-        }
+        }     
         else if (actionType == "backup")
         {
             BackupWareHouse *backup = new BackupWareHouse();
@@ -489,7 +492,7 @@ void WareHouse::removeVolunteer(int volunteerId)
     }
 }
 
-vector<Order *> &WareHouse::getCompletedOrders() 
+vector<Order *> &WareHouse::getCompletedOrders()
 {
     return completedOrders;
 }
