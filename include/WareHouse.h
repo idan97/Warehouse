@@ -43,10 +43,10 @@ public:
     void printAllOrders();                           // added by me
     string buildOrderInfo(const Order &order) const; // added by me
     void clearWareHouse();                           // added by me
-    vector<Order *> getPendingOrders() const;
-    vector<Order *> getInProcessOrders() const;
-    vector<Order *> getCompletedOrders() const;
-    vector<Volunteer *> getVolunteers() const;
+    vector<Order *> &getPendingOrders() ;
+    vector<Order *> &getInProcessOrders() ;
+    vector<Order *> &getCompletedOrders() ;
+    vector<Volunteer *> &getVolunteers() ;
     void readFirstInput();   // added by me
     void processUserInput(); // added by me
     void removeVolunteer(int volunteerId); // added by me

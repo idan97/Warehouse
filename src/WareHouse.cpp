@@ -173,7 +173,7 @@ Customer &WareHouse::getCustomer(int customerId) const
         }
     }
     // Return a default customer if not found
-    return *customers[0];
+    return emptyCustomer;
 }
 
 Volunteer &WareHouse::getVolunteer(int volunteerId) const
@@ -186,7 +186,7 @@ Volunteer &WareHouse::getVolunteer(int volunteerId) const
         }
     }
     // Return a default volunteer if not found
-    return *volunteers[0];
+    return emptyVolunteer;
 }
 
 Order &WareHouse::getOrder(int orderId) const
@@ -272,37 +272,43 @@ void WareHouse::clearWareHouse()
     {
         delete customer;
     }
+    customers.clear();
     for (auto &volunteer : volunteers)
     {
         delete volunteer;
     }
+    volunteers.clear();
     for (auto &order : pendingOrders)
     {
         delete order;
     }
+    pendingOrders.clear();
     for (auto &order : inProcessOrders)
     {
         delete order;
     }
+    inProcessOrders.clear();
     for (auto &order : completedOrders)
     {
         delete order;
     }
+    completedOrders.clear();
     for (auto &action : actionsLog)
     {
         delete action;
     }
+    actionsLog.clear();
 }
 
-vector<Order *> WareHouse::getPendingOrders() const
+vector<Order *>& WareHouse::getPendingOrders() 
 {
     return pendingOrders;
 }
-vector<Order *> WareHouse::getInProcessOrders() const
+vector<Order *> &WareHouse::getInProcessOrders()
 {
     return inProcessOrders;
 }
-vector<Volunteer *> WareHouse::getVolunteers() const
+vector<Volunteer *>& WareHouse::getVolunteers() 
 {
     return volunteers;
 }
@@ -483,7 +489,7 @@ void WareHouse::removeVolunteer(int volunteerId)
     }
 }
 
-vector<Order *> WareHouse::getCompletedOrders() const
+vector<Order *> &WareHouse::getCompletedOrders() 
 {
     return completedOrders;
 }

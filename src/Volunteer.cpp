@@ -30,6 +30,9 @@ bool Volunteer::isBusy() const
 CollectorVolunteer::CollectorVolunteer(int id, const string &name, int coolDown)
     : Volunteer(id, name), coolDown(coolDown), timeLeft(0) {}
 
+CollectorVolunteer ::CollectorVolunteer(const CollectorVolunteer &other)
+    : Volunteer(other.getId(), other.getName()), coolDown(other.getCoolDown()), timeLeft(other.getTimeLeft()) {}
+
 CollectorVolunteer *CollectorVolunteer::clone() const
 {
     return new CollectorVolunteer(*this);
@@ -104,7 +107,7 @@ string CollectorVolunteer::toString() const
         info += "OrderID: None\n";
         info += "TimeLeft: None\n";
     }
-    info += "OrdersLeft: No Limit";
+    info += "OrdersLeft: No Limit \n";
     return info;
 }
 
@@ -115,6 +118,9 @@ string CollectorVolunteer::getVolunteerType() const
 
 LimitedCollectorVolunteer::LimitedCollectorVolunteer(int id, const string &name, int coolDown, int maxOrders)
     : CollectorVolunteer(id, name, coolDown), maxOrders(maxOrders), ordersLeft(maxOrders) {}
+
+LimitedCollectorVolunteer::LimitedCollectorVolunteer(const LimitedCollectorVolunteer &other)
+    : CollectorVolunteer(other.getId(), other.getName(), other.getCoolDown()), maxOrders(other.getMaxOrders()), ordersLeft(other.getNumOrdersLeft()) {}
 
 LimitedCollectorVolunteer *LimitedCollectorVolunteer::clone() const
 {
@@ -162,7 +168,7 @@ string LimitedCollectorVolunteer::toString() const
         info += "OrderID: None\n";
         info += "TimeLeft: None\n";
     }
-    info += "OrdersLeft:" + std::to_string(getNumOrdersLeft());
+    info += "OrdersLeft:" + std::to_string(getNumOrdersLeft()) + "\n";
     return info;
 }
 
@@ -174,6 +180,8 @@ string LimitedCollectorVolunteer::getVolunteerType() const
 DriverVolunteer::DriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep)
     : Volunteer(id, name), maxDistance(maxDistance), distancePerStep(distancePerStep), distanceLeft(0) {}
 
+DriverVolunteer::DriverVolunteer(const DriverVolunteer &other)
+    : Volunteer(other.getId(), other.getName()), maxDistance(other.getMaxDistance()), distancePerStep(other.getDistancePerStep()), distanceLeft(other.getDistanceLeft()) {}
 DriverVolunteer *DriverVolunteer::clone() const
 {
     return new DriverVolunteer(*this);
@@ -222,7 +230,7 @@ bool DriverVolunteer::canTakeOrder(const Order &order) const
 void DriverVolunteer::acceptOrder(const Order &order)
 {
     activeOrderId = order.getId();
-    distanceLeft = maxDistance;
+    distanceLeft = order.getDistance();
 }
 
 void DriverVolunteer::step()
@@ -248,7 +256,7 @@ string DriverVolunteer::toString() const
         info += "OrderID: None\n";
         info += "TimeLeft: None\n";
     }
-    info += "OrdersLeft: No Limit";
+    info += "OrdersLeft: No Limit \n";
     return info;
 }
 
@@ -259,6 +267,9 @@ string DriverVolunteer::getVolunteerType() const
 
 LimitedDriverVolunteer::LimitedDriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep, int maxOrders)
     : DriverVolunteer(id, name, maxDistance, distancePerStep), maxOrders(maxOrders), ordersLeft(maxOrders) {}
+
+LimitedDriverVolunteer::LimitedDriverVolunteer(const LimitedDriverVolunteer &other)
+    : DriverVolunteer(other.getId(), other.getName(), other.getMaxDistance(), other.getDistancePerStep()), maxOrders(other.getMaxOrders()), ordersLeft(other.getNumOrdersLeft()) {}
 
 LimitedDriverVolunteer *LimitedDriverVolunteer::clone() const
 {
@@ -306,7 +317,7 @@ string LimitedDriverVolunteer::toString() const
         info += "OrderID: None\n";
         info += "TimeLeft: None\n";
     }
-    info += "OrdersLeft :" + std::to_string(getNumOrdersLeft()) ;
+    info += "OrdersLeft :" + std::to_string(getNumOrdersLeft()) + "\n";
     return info;
 }
 
