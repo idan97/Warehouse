@@ -40,14 +40,10 @@ CollectorVolunteer *CollectorVolunteer::clone() const
 
 void CollectorVolunteer::step()
 {
-    if (timeLeft > 0)
+    if (decreaseCoolDown())
     {
-        timeLeft--;
-        if (timeLeft == 0)
-        {
-            completedOrderId = activeOrderId;
-            activeOrderId = NO_ORDER;
-        }
+        completedOrderId = activeOrderId;
+        activeOrderId = NO_ORDER;
     }
 }
 
@@ -63,17 +59,8 @@ int CollectorVolunteer::getTimeLeft() const
 
 bool CollectorVolunteer::decreaseCoolDown()
 {
-    if (timeLeft > 0)
-    {
-        timeLeft--;
-        if (timeLeft == 0)
-        {
-            completedOrderId = activeOrderId;
-            activeOrderId = NO_ORDER;
-        }
-        return true;
-    }
-    return false;
+    timeLeft--;
+    return timeLeft == 0;
 }
 
 bool CollectorVolunteer::hasOrdersLeft() const
@@ -204,17 +191,14 @@ int DriverVolunteer::getDistancePerStep() const
 
 bool DriverVolunteer::decreaseDistanceLeft()
 {
-    if (distanceLeft > 0)
+
+    distanceLeft -= distancePerStep;
+    if (distanceLeft < 0)
     {
-        distanceLeft -= distancePerStep;
-        if (distanceLeft <= 0)
-        {
-            completedOrderId = activeOrderId;
-            activeOrderId = NO_ORDER;
-        }
-        return true;
+        distanceLeft = 0;
     }
-    return false;
+
+    return distanceLeft <= 0;
 }
 
 bool DriverVolunteer::hasOrdersLeft() const
@@ -235,9 +219,10 @@ void DriverVolunteer::acceptOrder(const Order &order)
 
 void DriverVolunteer::step()
 {
-    if (distanceLeft > 0)
+    if (decreaseDistanceLeft())
     {
-        decreaseDistanceLeft();
+        completedOrderId = activeOrderId;
+        activeOrderId = NO_ORDER;
     }
 }
 
@@ -293,7 +278,7 @@ bool LimitedDriverVolunteer::hasOrdersLeft() const
 
 bool LimitedDriverVolunteer::canTakeOrder(const Order &order) const
 {
-    return DriverVolunteer::canTakeOrder(order) && ordersLeft > 0;
+    return DriverVolunteer::canTakeOrder(order) && hasOrdersLeft();
 }
 
 void LimitedDriverVolunteer::acceptOrder(const Order &order)
